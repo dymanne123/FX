@@ -24,10 +24,12 @@ while(True):
 
     # Bitwise-AND mask and original image
     res = cv2.bitwise_and(img,img, mask= mask)
-
+    res_bw = cv2.cvtColor(res, cv2.COLOR_HSV2BGR)
+    res_bw_fin = cv2.cvtColor(res_bw, cv2.COLOR_BGR2GRAY)
     #cv2.imshow('video',img)
     #cv2.imshow('mask',mask)
-    cv2.imshow('res',res)
+    cv2.imshow('res',res_bw_fin)
+    #press esc to end
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break
