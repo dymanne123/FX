@@ -26,11 +26,12 @@ while True :
     img_gray_blurred = cv2.GaussianBlur(result_hsv2gray, (5,5),0)
     fld_detector = cv2.ximgproc.createFastLineDetector()
     fld_segments = fld_detector.detect(img_gray_blurred)
-    #fld_segments2format = fd2format_s(fld_segments)
-
-
+    #It can be none type object
+    if fld_segments is None:
+        pass 
+    else:
+        fld_segments2format = fd2format_s(fld_segments)
     #pherhaps we can filter by longitude
-
     out_fld = fld_detector.drawSegments(img, fld_segments)
 
     cv2.imshow("img",out_fld)
