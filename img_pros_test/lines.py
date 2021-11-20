@@ -20,4 +20,37 @@ def fd2format_s(lsd_output):
         final_selection[x][6] = c
         final_selection[x][7] = np.linalg.norm(A2 - A1)
     return final_selection
-    
+
+def draw_lines(img, lines, color, thickness) :
+    h,w,c = img.shape
+    for line in lines:
+        x1, y1, x2, y2, a ,b,c,n = line
+        if a ==0 and b !=0:
+            y3 = -c/b
+            y4= y3
+            x3 = 0
+            x4 = h
+            cv2.line(img, (int(x3), int(y3)), (int(x4), int(y4)),color, thickness )
+        elif a!= 0:
+            y3 = 0
+            x3 = (-b * y3 - c)/(a)
+            y4 = h
+            x4 = (-b* y4 -c )/(a)
+            if x3 > w:
+                x3 = h
+                y3 = (-a*x3-c)/b
+                if x4<0:
+                    x4 = 0
+                    y4 = (-a*x3-c)/b
+                elif x4 >w:
+                    x4 = w
+                    y4 = (-a*x3-c)/b
+            elif x3 < 0:
+                x3 = 0
+                y3 = (-a*x3-c)/b
+                if x4>w:
+                    x4 = w
+                    y4 = (-a*x3-c)/b 
+            cv2.line(img, (int(x3), int(y3)), (int(x4), int(y4)),color, thickness )
+        else:
+            pass
