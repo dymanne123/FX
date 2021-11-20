@@ -54,3 +54,17 @@ def draw_lines(img, lines, color, thickness) :
             cv2.line(img, (int(x3), int(y3)), (int(x4), int(y4)),color, thickness )
         else:
             pass
+        
+def classif_l_r(lines):
+    #We classify depending on the signs of a(4th pos) and b(5th pos)
+    line_r_pos = lines[lines[:,4] > 0]
+    line_r_pos = line_r_pos[line_r_pos[:, 5] > 0]
+    line_r_neg = lines[lines[:,4] < 0]
+    line_r_neg = line_r_neg[line_r_neg[:, 5] < 0]
+    line_r = np.concatenate((line_r_pos,line_r_neg), axis=0)
+    line_left = lines[lines[:,4] < 0]
+    line_left = line_left[line_left[:,5] >0]
+    line_left2= lines[lines[:,4]>0]
+    line_left2= line_left2[line_left2[:,5]<0]
+    line_l = np.concatenate((line_left,line_left2), axis=0)
+    return (line_r,line_l)
