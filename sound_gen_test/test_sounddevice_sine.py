@@ -2,9 +2,11 @@
 """Play a sine signal."""
 import argparse
 import sys
-
+import inspect
 import numpy as np
+from scipy.linalg.matfuncs import tanhm
 import sounddevice as sd
+from scipy.signal import chirp, square, sawtooth
 
 
 def int_or_str(text):
@@ -62,6 +64,7 @@ try:
         the nwe t will be (1136,1) (before 1136,)
         """
         t = t.reshape(-1, 1)
+        print(t)
         #Outdata is the same shape as t
         #print(outdata)
         """
@@ -72,7 +75,10 @@ try:
 
         outdata[:] = args.amplitude * np.sin(2 * np.pi * args.frequency * t)
         start_idx += frames
+        print(outdata.shape)
         print(time.currentTime)
+        print(inspect.getmembers(time, lambda a:not(inspect.isroutine(a))))
+        # print(inspect.getmembers(status, lambda a:not(inspect.isroutine(a))))
 
 
         """
