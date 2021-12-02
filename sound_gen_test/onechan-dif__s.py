@@ -4,9 +4,10 @@ import argparse
 import sys
 import inspect
 import numpy as np
+from scipy.linalg.matfuncs import tanhm
 import sounddevice as sd
 from scipy.signal import chirp, square, sawtooth
-import copy
+import time as tm
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -40,16 +41,17 @@ parser.add_argument(
 args = parser.parse_args(remaining)
 
 start_idx = 0
+start_time = tm.time()
 
 try:
     samplerate = sd.query_devices(args.device, 'output')['default_samplerate']
     #we try to query the classic sampelrate 4 our devie
 
     def callback(outdata, frames, time, status):
-        status = True
         if status:
             print(status, file=sys.stderr)
         global start_idx
+        global start_time
         """
         In t we add the startindex to an arrange of the number of frames that
         is nparrray(1...1136), in that way we start at the start index until the
@@ -57,8 +59,6 @@ try:
         way we have our time stamp np arrang.
         """
         t = (start_idx + np.arange(frames)) / samplerate
-        t_copy = copy.deepcopy(t)
-
         #print(t.shape)
         #In our case frames is equal to 1136
         """
@@ -66,9 +66,7 @@ try:
         the nwe t will be (1136,1) (before 1136,)
         """
         t.reshape(-1, 1)
-        print(t.shape)
-        #np.append(t,t,axis=1)
-        
+        print(t)
         #Outdata is the same shape as t
         #print(outdata)
         """
@@ -76,10 +74,18 @@ try:
         then we rewrite data with our given sine array. After that they take the prevoious
         one and rewrite another. We make the operation to obtain our soind
         """
+        end_time = tm.time()
+        if (end_time- start_time) >4:
+            outdata[:,0] = args.amplitude * sawtooth(2 * np.pi * args.frequency * t)
+            #outdata[:,1] = args.amplitude * square(2 * np.pi * args.frequency * t)
+            pass
+        else:
+            
+            outdata[:,0] = args.amplitude * np.sin(2 * np.pi * args.frequency * t)
+            outdata[:,1] = args.amplitude * square(2 * np.pi * args.frequency * t)
 
-        outdata[:,0] = args.amplitude * np.sin(2 * np.pi * args.frequency*t)
-        outdata[:,1] = args.amplitude * sawtooth(2 * np.pi * args.frequency * t)
         start_idx += frames
+        print(outdata.shape)
         print(time.currentTime)
         print(inspect.getmembers(time, lambda a:not(inspect.isroutine(a))))
         # print(inspect.getmembers(status, lambda a:not(inspect.isroutine(a))))
