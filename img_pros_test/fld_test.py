@@ -46,6 +46,7 @@ while True :
     if fld_segments is None:
         pass 
     else:
+        print(fld_segments.shape)
         fld_segments2format = fd2format_s(fld_segments)
     out_fld = fld_detector.drawSegments(img, fld_segments)
 
