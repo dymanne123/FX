@@ -14,7 +14,7 @@ while(True):
     if ret: 
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(img_gray, 150, 255, cv2.THRESH_BINARY)
-        #cv2.imshow('Binary image', thresh)
+        cv2.imshow('Binary image', thresh)
         contours, hierarchy = cv2.findContours(image=thresh, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
         img_copy = img.copy()
         cv2.drawContours(image=img_copy, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
