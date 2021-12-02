@@ -13,7 +13,9 @@ while True :
 
     # Threshold the HSV image to get only blue colors
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    mask_by_color = cv2.inRange(img_hsv, lower_green, upper_green)
+    mask_by_color = cv2.inRange(img_hsv, lower_green, upper_green) # HFB : Good
+    
+    """
     # Bitwise-AND mask and original image
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -23,7 +25,7 @@ while True :
 
 
     # img_gray_blurred = cv2.GaussianBlur(img_gray, (5,5),0)
-    img_gray_blurred = cv2.GaussianBlur(result_hsv2gray, (5,5),0)
+    img_gray_blurred = cv2.GaussianBlur(result_hsv2gray, (5,5), 0)
     fld_detector = cv2.ximgproc.createFastLineDetector()
     fld_segments = fld_detector.detect(img_gray_blurred)
     #It can be none type object
@@ -32,9 +34,24 @@ while True :
     else:
         fld_segments2format = fd2format_s(fld_segments)
     #pherhaps we can filter by longitude
+    out_fld = fld_detector.drawSegments(img, fld_segments)"""
+    
+    # HFB :
+    img_gray_blurred = cv2.GaussianBlur(mask_by_color, (31, 31), 0)
+    img_gray_blurred[img_gray_blurred>100] = 255
+    img_gray_blurred[img_gray_blurred<100] = 0
+    cv2.imshow("gree-detect", img_gray_blurred)
+    fld_detector = cv2.ximgproc.createFastLineDetector()
+    fld_segments = fld_detector.detect(img_gray_blurred)
+    if fld_segments is None:
+        pass 
+    else:
+        fld_segments2format = fd2format_s(fld_segments)
     out_fld = fld_detector.drawSegments(img, fld_segments)
 
-    cv2.imshow("img",out_fld)
+
+    
+    cv2.imshow("img", img)
 
     #1 mettre l'image en gris et faire lsd
     # appliquer le out a lsd2format
