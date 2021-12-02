@@ -1,0 +1,34 @@
+### 30/09
+
+- Investigate first signal processing stuff on a real viedo stream (coming from the webcam).
+
+e.g make a grayscaled image where pixels which are green in the source image are light on the grayscaled image, and others are black. This is color detection.
+
+
+- investigate how to produce a sound that you can modulate, from a wave form that you compute periodically.
+
+Use scipy and numpy for the computation if what you need exists, opencv helps you with display and video capture.... but it may have algorithms that scipy does not have (e.g. LSD).
+
+
+It is too early now for adressing the "scientific demo" part of the project, but keep in mind that your software aims at illustrating t non scientific people the kind of computation that is required to make such FXs.
+
+### 15/10
+
+Ana Sofia and Yimin were present. Youssef was missing.
+
+Yimin has experimented on DrawContour and color detection. This was a good start.
+
+Next stage is to test LSD (line segment detector) ongray image that come out of green detection, and to handle the segments as ax+by+c lines.
+
+Maybe k-means on the (a, b, c) values will help to gather the lines we get from LSD into the 2 main borders of the saber....
+
+We will meet after the exams, since the next week will be very busy for the students.
+
+
+### 2/12
+
+Image : Need methodological approach... Apply mask, gaussian blur, thresholdinng... Show me the cloud of (a,b,c) coefficients of the detected segments. Detect the 2 main clusters (are they the 2 edges ?). Display the line corresponding to the 2 centroids on the colored input image. Is it the saber edges ?
+
+Sound : make a ROS-like design (with a thread).
+
+
