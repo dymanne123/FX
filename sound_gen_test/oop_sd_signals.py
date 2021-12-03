@@ -16,38 +16,45 @@ import argparse
 import numpy as np
 from scipy.signal import chirp, square, sawtooth
 
+import threading
+from multiprocessing import Lock
+
 class SaberSound:
-    def __init__(self, device, samplerate, amplitude) -> None:
+    def __init__(self, device, samplerate, amplitude):
         self.sample_rate = samplerate
         self.device = device
         self.amplitude = amplitude
         self.start_idx = 0
-        self.value = 0
+
+        self.data_mutex = Lock()
+        self.value = 0 # Used inside the cb (i;e. the thread) only
+        self.target_value = 0
         self.sound_gen = sd.OutputStream(device=self.device, channels=1, callback=self.on_sound,
                          samplerate= self.sample_rate)
 
-
+    def start(self):
+        self.sound_gen.__enter__()                # ugly ?
+        
+    def stop(self):
+        self.sound_gen.__exit__(None, None, None) # ugly ?
+            
     def on_sound(self, outdata, frames, time, status):
+        with self.data_mutex:
+            target_value = self.target_value
+        alpha = .01
+        self.value = alpha*target_value + (1-alpha)*self.value #  v += alpha(t-v)
+        
         t = (self.start_idx + np.arange(frames)) / self.sample_rate
-        t = t.reshape(-1, 1)
-        if self.value ==0:
-            outdata[:] = args.amplitude * np.sin(2 * np.pi * args.frequency * t)
-        elif self.value==1:
-            outdata[:] = args.amplitude * square(2 * np.pi * args.frequency * t)
+        noise = np.random.rand(len(t))*.1*self.value
+        signal = args.amplitude *self.value * np.sin(2 * np.pi * args.frequency * t) + noise
+
+        # send signal to sound buffer
+        outdata[:] = signal.reshape(-1, 1)
         self.start_idx += frames
 
-    def set_value(self):
-        if self.value ==1:
-            self.value = 0
-        else:
-            self.value = 1
-
-    def loop(self):
-        with self.sound_gen:
-            while True:
-                self.set_value()
-                time.sleep(0.4)
-                print(self.value)
+    def set_value(self, v):
+        with self.data_mutex:
+            self.target_value = v
                     
         
 
@@ -80,8 +87,19 @@ if __name__== "__main__":
 
     samplerate = sd.query_devices(args.device, 'output')['default_samplerate']
 
-    Test1 = SaberSound(args.device, samplerate, args.amplitude)
-    Test1.loop()
-    #Test1
+    saber_sound = SaberSound(args.device, samplerate, args.amplitude)
+    saber_sound.start()
+    values = (1+np.sin(np.linspace(0, 10*np.pi, 100)))*.5
+    for value in values:
+        time.sleep(.1)
+        saber_sound.set_value(value)
+        value = not value
+    saber_sound.stop()
+
+    print('I am done')
+        
+        
+    
+    
 
         
