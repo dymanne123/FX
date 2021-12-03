@@ -45,8 +45,11 @@ class SaberSound:
         self.value = alpha*target_value + (1-alpha)*self.value #  v += alpha(t-v)
         
         t = (self.start_idx + np.arange(frames)) / self.sample_rate
-        noise = np.random.rand(len(t))*.1*self.value
-        signal = args.amplitude *self.value * np.sin(2 * np.pi * args.frequency * t) + noise
+        noise = np.random.rand(frames)*.01*self.value
+        cracks = np.zeros(frames)
+        cracks[np.random.rand(frames) > .999] = 1 # 10% des valeurs à 1.
+        freq = 200 #Hz
+        signal = args.amplitude * (.1+self.value) * np.sin(2 * np.pi * freq * t) + cracks*.1 + noise
 
         # send signal to sound buffer
         outdata[:] = signal.reshape(-1, 1)
