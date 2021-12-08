@@ -13,5 +13,8 @@ functions implemented:
 functions to be implemented:
 
 the result of image processing:
+(lines directly detected by fld VS. lines computed by cluseter function)
+KMeans:
+![image](https://user-images.githubusercontent.com/75115606/145249212-6ecf91bd-b031-4462-b66e-e4fefd87f1c1.png)
 
 
