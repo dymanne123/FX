@@ -1,15 +1,17 @@
 # FX
 functions implemented:
 
-1.colored detect
+1.color detect:
 
-2.sound visualize(turn sound into waves)
+2.line detect, with fld
+
+3.get (a,b,c) of each line and the point cloud
+
+4.get the cluster centers of two main cluster, draw the main line
 
 
 functions to be implemented:
 
-1.line detect and color filling
+the result of image processing:
 
-2.moving detect or hit detect
 
-3.creating sounds
