@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial import distance as dist
 from sklearn.cluster import KMeans
+
 #To get a,b,c, knowing (x1,y1),(x2,y2)
 def get_line_abc(x1,y1,x2,y2):
     if (x2-x1!=0):
@@ -19,8 +20,8 @@ def get_line_abc(x1,y1,x2,y2):
 
 
 cap = cv2.VideoCapture(0) # 0 means /dev/video0, 1 for /dev/video1, ...
-fig = plt.figure()
-ax1 = plt.axes(projection='3d')
+#fig = plt.figure()
+#ax1 = plt.axes(projection='3d')
 
 while True :
     _, img = cap.read()
@@ -42,28 +43,24 @@ while True :
     #cv2.imshow("gree-detect", img_gray_blurred)
     fld_detector = cv2.ximgproc.createFastLineDetector()
     fld_segments = fld_detector.detect(img_gray_blurred)
+    if fld_segments is not None:
+        fld_segments = fld_segments.reshape((fld_segments.shape[0], 4)) # fld_segments was (n, 1, 4) shaped
+    
     img_lines=fld_detector.drawSegments(img,fld_segments)
     cv2.imshow('lines',img_lines)
     if fld_segments is None:
         pass 
     else:
         #print(fld_segments)
-        matrix_abc=[[0 for j in range(3)] for i in range(fld_segments.shape[0])]
+        # matrix_abc=[[0 for j in range(3)] for i in range(fld_segments.shape[0])]
+        matrix_abc=np.zeros((fld_segments.shape[0], 3), dtype=float)
         #knowing the start point and end point, get a,b,c of detected lines.
-        for i in range(fld_segments.shape[0]):
-            array_abc=get_line_abc(fld_segments[i][0][0],fld_segments[i][0][1],fld_segments[i][0][2],fld_segments[i][0][3])
-            matrix_abc[i]=array_abc
-            ax1.scatter3D(array_abc[0],array_abc[1],array_abc[2], cmap='Blues')
-        
+        matrix_abc=np.array([get_line_abc(x1, y1, x2, y2) for x1, y1, x2, y2 in fld_segments])
         if fld_segments.shape[0]>1:
             kmeans = KMeans(n_clusters=2, random_state=0).fit(matrix_abc)
             #print(kmeans.cluster_centers_)
-            a1=kmeans.cluster_centers_[0][0]
-            b1=kmeans.cluster_centers_[0][1]
-            c1=kmeans.cluster_centers_[0][2]
-            a2=kmeans.cluster_centers_[1][0]
-            b2=kmeans.cluster_centers_[1][1]
-            c2=kmeans.cluster_centers_[1][2]
+            a1, b1, c1 = kmeans.cluster_centers_[0]
+            a2, b2, c2 = kmeans.cluster_centers_[1]
 
             ymax,ymin=y_max(fld_segments)
             cv2.line(img,(int((-ymin-c1)/a1),int(ymin)),(int((-ymax-c1)/a1),int(ymax)),(255,0,0),1)
