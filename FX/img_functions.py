@@ -75,7 +75,7 @@ def img_process(img):
     img_gray_blurred = cv2.GaussianBlur(mask_by_color, (31, 31), 0)
     img_gray_blurred[img_gray_blurred>100] = 255
     img_gray_blurred[img_gray_blurred<100] = 0
-    #cv2.imshow("gree-detect", img_gray_blurred)
+    cv2.imshow("green-detect", img_gray_blurred)
 
 
     fld_detector = cv2.ximgproc.createFastLineDetector()
@@ -92,7 +92,7 @@ def img_process(img):
 
         #knowing the start point and end point, get a2,b2 of detected lines:
         matrix_ab=np.array([get_2theta(get_line_ab(x1, y1, x2, y2)[0],get_line_ab(x1, y1, x2, y2)[1]) for x1, y1, x2, y2 in fld_segments])
-        #print(matrix_ab)
+        print(matrix_ab)
         if fld_segments.shape[0]>1:
             kmeans = KMeans(n_clusters=1).fit(matrix_ab)
             #print(kmeans.cluster_centers_)
