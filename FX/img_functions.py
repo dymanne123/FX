@@ -95,7 +95,7 @@ def img_process(img):
         #print(matrix_ab)
         if fld_segments.shape[0]>1:
             kmeans = KMeans(n_clusters=1).fit(matrix_ab)
-            print(kmeans.cluster_centers_)
+            #print(kmeans.cluster_centers_)
             a, b= kmeans.cluster_centers_[0]
             a,b=get_half_angle(a,b)
             #make a2,b2 return to a,b, after clustering;
@@ -106,7 +106,7 @@ def img_process(img):
             #print(distribution_c)
             kmeans_c=KMeans(n_clusters=2,random_state=0).fit(distribution_c)
             c1,c2=kmeans_c.cluster_centers_
-            print(c1,c2)
+            #print(c1,c2)
 
 
             draw_lines(img,img.shape[0],img.shape[1],a,b,c1)
