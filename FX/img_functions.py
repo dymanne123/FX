@@ -6,63 +6,77 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial import distance as dist
 from sklearn.cluster import KMeans
 import math
-#get (a,b) knowing two points:
+#For a line: a*x+b*y+c=0, get w=(a,b) with two points(x1,y1), (x2,y2)
 def get_line_ab(x1,y1,x2,y2):
-    if (x2-x1!=0):
-        a=(y1-y2)/(x2-x1)
-        b=1
-        k=math.sqrt(1+a*a)
-        a=a/k
-        b=b/k
-    else:
-        a=1
-        b=0
-    return (a,b)
+    A1=np.transpose(np.array([x1,y1]))
+    A2 =np.transpose (np.array([x2,y2]))
+    u = (A2- A1)  /np.linalg.norm(A2 - A1)
+    w = - np.array([[0, 1], [-1, 0]]).dot(u)
+    if w[1]<0:
+        w=-w
+    return w
 
-#get c knowing the point and (a,b):
-def get_c(x1,y1,x2,y2,a,b):
-    c1=-a*x1-b*y1
-    c2=-a*x2-b*y2
-    return (c1,c2)
+#For a line: a*x+b*y+c=0, get c knowing a point(x,y) on it and w=(a,b):
+def get_c(x,y,w):
+    c=- w.dot(np.transpose(np.array([x,y]))) 
+    return c
 
-#we know a=cos(theta),b=sin(theta),get (a2,b2) when 2*theta:
-def get_2theta(a,b):
-    b2=2*a*b
-    a2=a*a-b*b
-    return (a2,b2)
+#For w=(a,b)=(cos(theta),sin(theta)), get a new_w=(cos(2*theta),sin(2*theta))
+def get_new_w(w):
+    theta=math.acos(w[0])
+    new_w=np.array([math.cos(2*theta),math.sin(2*theta)])
+    return new_w
 
-#get (half_angle_a,half_angle_b) when theta/2:
-def get_half_angle(a,b):
-    half_angle_b=math.sqrt((1-a)/2)
-    if b>=0:
-        half_angle_a=math.sqrt((1+a)/2)
-    else:
-        half_angle_a=-math.sqrt((1+a)/2)
-    return (half_angle_a,half_angle_b)
+#For w=(cos(2*theta),sin(2*theta)), get orig_w=(cos(theta),sin(theta))
+def get_orig_w(w):
+    theta=math.acos(w[0])
+    if w[1]<0:
+        theta=2*math.pi-theta
+    orig_w=np.array([math.cos(theta/2),math.sin(theta/2)])    
+    return orig_w
 
+#Draw a line: a*x+b*y+c=0, with w=(a,b),c on img
+def draw_lines(img,w,c):
+    hei,wid,num=img.shape
+    a,b=w
+    n=0
+    arr_to_draw=np.zeros((2,2))
+    arr_p0=np.array([(0,0),(wid,0),(0,hei),(wid,hei)])
+    arr_p=np.array([a*arr[0]+b*arr[1]+c for arr in arr_p0])
+    #print(arr_p)
+    arr_p.flatten()
+    #print(arr_p)
+    for i in range(4):
+        if arr_p[i]==0:
+           arr_to_draw[n]=arr_p0[i]
+           n=n+1 
+    arr_l=np.array([arr_p[0]*arr_p[1],arr_p[0]*arr_p[2],arr_p[1]*arr_p[3],arr_p[2]*arr_p[3]])
+    if arr_l[0]<0:
+        arr_to_draw[n]=np.array([-c/a,0])
+        n=n+1
+    if arr_l[1]<0:
+        arr_to_draw[n]=np.array([0,-c/b])
+        n=n+1
+    if arr_l[2]<0:
+        arr_to_draw[n]=np.array([wid,(-a*wid-c)/b])
+        n=n+1
+    if arr_l[3]<0:
+        arr_to_draw[n]=np.array([(-b*hei-c)/a,hei])
+        n=n+1
+    arr_to_draw=arr_to_draw.astype('int')
+    #print(arr_to_draw)
+    cv2.line(img,(arr_to_draw[0][0],arr_to_draw[0][1]),(arr_to_draw[1][0],arr_to_draw[1][1]),(255,0,0),1)
+    return
 
-def draw_lines(img,w,h,a,b,c):
-    p1,p2,p3,p4=-c/b,(-a*w-c)/b,-c/a,(-b*h-c)/a
-    if (p1>=0) and (p1<=h) and (p2>=0) and (p2<=h):
-        cv2.line(img,(0,int(p1)),(w,int(p2)),(255,0,0),1)
-        return
-    if (p1>=0) and (p1<=h) and (p3>=0) and (p3<=w):
-        cv2.line(img,(0,int(p1)),(int(p3),0),(255,0,0),1)
-        return
-    if (p1>=0) and (p1<=h) and (p4>=0) and (p4<=w):
-        cv2.line(img,(0,int(p1)),(int(p4),h),(255,0,0),1)
-        return
-    if (p2>=0) and (p2<=h) and (p3>=0) and (p3<=w):
-        cv2.line(img,(w,int(p2)),(int(p3),0),(255,0,0),1)
-        return
-    if (p2>=0) and (p2<=h) and (p4>=0) and (p4<=h):
-        cv2.line(img,(w,int(p2)),(int(p4),h),(255,0,0),1)
-        return
-    if (p3>=0) and (p3<=w) and (p4>=0) and (p4<=h):
-        cv2.line(img,(int(p3),0),(int(p4),h),(255,0,0),1)
-        return
+def display_matrix(matrix_ab,matrix_ab_orig,arr_c,axs):
+    plt.cla()
+    axs[0].scatter(matrix_ab[:,0],matrix_ab[:,1])
+    axs[1].scatter(matrix_ab_orig[:,0],matrix_ab_orig[:,1])
+    axs[2].scatter(arr_c,np.zeros_like(arr_c))
+    plt.show()
+    plt.pause(100)
 
-def img_process(img):
+def img_process(img,axs):
     lower_green = np.array([35,43,46],dtype=np.uint8)
     upper_green = np.array([77,255,255],dtype=np.uint8)
 
@@ -75,7 +89,7 @@ def img_process(img):
     img_gray_blurred = cv2.GaussianBlur(mask_by_color, (31, 31), 0)
     img_gray_blurred[img_gray_blurred>100] = 255
     img_gray_blurred[img_gray_blurred<100] = 0
-    cv2.imshow("green-detect", img_gray_blurred)
+    #cv2.imshow("gree-detect", img_gray_blurred)
 
 
     fld_detector = cv2.ximgproc.createFastLineDetector()
@@ -89,27 +103,28 @@ def img_process(img):
         pass 
     else:
         matrix_ab=np.zeros((fld_segments.shape[0], 2), dtype=float)
-
+        matrix_orig=np.zeros((fld_segments.shape[0], 2), dtype=float)
         #knowing the start point and end point, get a2,b2 of detected lines:
-        matrix_ab=np.array([get_2theta(get_line_ab(x1, y1, x2, y2)[0],get_line_ab(x1, y1, x2, y2)[1]) for x1, y1, x2, y2 in fld_segments])
+        matrix_orig=np.array([get_line_ab(x1, y1, x2, y2) for x1,y1,x2,y2 in fld_segments])
+        matrix_ab=np.array([get_new_w(get_line_ab(x1, y1, x2, y2)) for x1,y1,x2,y2 in fld_segments])
         print(matrix_ab)
         if fld_segments.shape[0]>1:
             kmeans = KMeans(n_clusters=1).fit(matrix_ab)
             #print(kmeans.cluster_centers_)
-            a, b= kmeans.cluster_centers_[0]
-            a,b=get_half_angle(a,b)
+            w= kmeans.cluster_centers_[0]
+            w=get_orig_w(w)
             #make a2,b2 return to a,b, after clustering;
             #then get c
-            distribution_c=np.array([get_c(x1,y1,x2,y2,a,b) for x1,y1,x2,y2 in fld_segments])
-           
-            distribution_c=distribution_c.reshape((distribution_c.shape[0]*2,-1))
+            distribution_c=np.array([[get_c(x1,y1,w),get_c(x2,y2,w)] for x1,y1,x2,y2 in fld_segments])
+            distribution_c=distribution_c.reshape(-1,1)
+        
             #print(distribution_c)
             kmeans_c=KMeans(n_clusters=2,random_state=0).fit(distribution_c)
             c1,c2=kmeans_c.cluster_centers_
             #print(c1,c2)
+            display_matrix(matrix_ab,matrix_orig,distribution_c,axs)
 
-
-            draw_lines(img,img.shape[0],img.shape[1],a,b,c1)
-            draw_lines(img,img.shape[0],img.shape[1],a,b,c2)           
+            draw_lines(img,w,c1)
+            draw_lines(img,w,c2)           
     cv2.imshow("img", img)
     return   
