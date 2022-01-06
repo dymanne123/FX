@@ -5,18 +5,17 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial import distance as dist
 from sklearn.cluster import KMeans
-from img_functions import get_c, get_half_angle, get_line_ab,get_2theta,img_process
+from img_functions import img_process
 
 
 cap = cv2.VideoCapture(0) # 0 means /dev/video0, 1 for /dev/video1, ...
-#fig = plt.figure()
-#ax1 = plt.axes(projection='3d')
+plt.ion()
+fig,axs=plt.subplots(2,2)
 
 while True :
     _, img = cap.read()
-    width = int(cap.get(3))
-    height = int(cap.get(4))
-    img_process(img)
+    pause_time=0.1
+    img_process(img,axs,pause_time)
     
     if cv2.waitKey(1)== ord("q"):
         break
