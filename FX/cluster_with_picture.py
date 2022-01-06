@@ -12,11 +12,11 @@ from img_functions import img_process
 
 #cap = cv2.VideoCapture(0) # 0 means /dev/video0, 1 for /dev/video1, ...
 plt.ion()
-fig,axs=plt.subplots(3, 1, sharex=True)
+fig,axs=plt.subplots(2,2)
 
 img = cv2.imread("./green_sable.png") 
 img_process(img,axs)
 
-plt.show()
+plt.pause(100)
 #cap.release()
 #cv2.destroyAllWindows()
