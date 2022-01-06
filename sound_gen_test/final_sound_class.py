@@ -95,8 +95,6 @@ if __name__== "__main__":
 
     samplerate = sd.query_devices(args.device, 'output')['default_samplerate']
     wav_file = "./sound_gen_test/sound_analysis/good_loop_lightsaber.wav"
-    wav_file2= "./sound_gen_test/sound_analysis/little_laser_sound.wav"
-
     saber_sound = SaberSound(args.device, samplerate, args.amplitude, wav_file)
     saber_sound.start()
     values = (1 + np.sin(np.linspace(0, 10*np.pi, 100)))*.5
