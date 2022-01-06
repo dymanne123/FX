@@ -129,31 +129,6 @@ def change2theta_c(arrabtheta, arrc):
     return np.array([[a, b, c1], [a, b, c2]])
 
 
-def mapping(points, a, b, c):
-    values = np.array(map(lambda x: x[0] * a + x[1] * b + c, points))
-    signs = np.sign(values)
-    if signs[0] != signs[2] and signs[1] != signs[3]:
-        if signs[1] == signs[2]:
-            # vertical
-            pass
-        # horizontal
-    elif signs[0] != signs[2]:
-        if signs[2] > signs[0]:
-            # |_
-            pass
-        else:
-            # -|
-            pass
-    elif signs[1] != signs[3]:
-        if signs[1] > signs[3]:
-
-            # |-
-            pass
-        else:
-            # _|
-            pass
-
-
 def draw_lines(img, lines):
     """
     Parameters
@@ -214,24 +189,18 @@ def img_procesings(img):
     cv2.imshow("lines", img_lines)
 
     if fld_segments is None:
-        # verify
+        pass
+    else:
         canonical_eq = segments2canonical(fld_segments)
         # research abt matrix
         abtheta = canonical_eq[:, :3]
         c_values = canonical_eq[:, -1]
         result = change2theta_c(abtheta, c_values)
-
-        plt.figure()
-        plt.scatter(abtheta[0], abtheta[1])
-        plt.xlabel("valeur de a")
-        plt.ylabel("valeur de b")
-        plt.title("transformations")
-        plt.scatter(ab2theta[0], ab2theta[1])
-
-        pass
-    else:
-
-        pass
+        # plt.figure()
+        # plt.scatter(abtheta[0], abtheta[1])
+        # plt.xlabel("valeur de a")
+        # plt.ylabel("valeur de b")
+        # plt.title("transformations")
 
 
 if __name__ == "__main__":
