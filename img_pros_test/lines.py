@@ -21,6 +21,8 @@ def fd2format_s(lsd_output):
         final_selection[x][7] = np.linalg.norm(A2 - A1)
     return final_selection
 
+
+
 def draw_lines(img, lines, color, thickness) :
     h,w,c = img.shape
     for line in lines:
