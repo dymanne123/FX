@@ -69,6 +69,8 @@ def generate_coeff_arr(array):
     dir_vec = np.array([array[0] - array[2], array[1] - array[3]])
     dir_vec_n = dir_vec / np.sqrt(np.sum(dir_vec ** 2))
     a, b = -dir_vec_n[-1], dir_vec_n[0]
+    if b < 0:
+        a, b = -a, -b
     c = -(array[0] * a + array[1] * b)
     theta = math.acos(a)
     return np.array([a, b, theta, c])
@@ -118,19 +120,33 @@ def change2theta_c(arrabtheta, arrc):
         2d numpy array containing (a,b,c) that are the
 
     """
-    f = lambda x: np.array([math.cos(2 * x[-1]), math.sin(2 * x[-1]), 2 * x[-1]])
+    f = lambda x: np.array([math.cos(2 * x[-1]), math.sin(2 * x[-1])])
     matrix = np.apply_along_axis(f, 1, arrabtheta)
     kmeans_ab = KMeans(n_clusters=1).fit(matrix)
-    a_prime = kmeans_ab.cluster_centers_[0][0]
-    theta_prime = math.acos(a_prime) / 2
-    kmeancs_c = KMeans(n_clusters=2).fit(arrc)
-    c1, c2 = kmeancs_c.cluster_centers_
-    a, b = math.cos(theta_prime), math.sin(theta_prime)
+    print(matrix)
+    ab = kmeans_ab.cluster_centers_
+    a_prime, b_prime = ab.flatten()
+    print(ab)
+    plt.scatter(matrix[:, 0], matrix[:, 1])
+    plt.scatter(a_prime, b_prime, s=80)
+    plt.xlabel("valeur de a")
+    plt.ylabel("valeur de b")
+    plt.title("kmeans de la tranformation de a et b")
+    plt.show()
+    theta_prime = math.acos(a_prime)
+    if b_prime < 0:
+        theta_prime = 2 * math.pi - theta_prime
+    a, b = math.cos(theta_prime / 2), math.sin(theta_prime / 2)
+    arrc = arrc.reshape(-1, 1)
+    kmeancs_c = KMeans(n_clusters=2, random_state=0).fit(arrc)
+    clusters_c = kmeancs_c.cluster_centers_
+    c1, c2 = clusters_c.flatten()
     return np.array([[a, b, c1], [a, b, c2]])
 
 
 def draw_lines(img, lines):
     """
+    TO DO
     Parameters
     ----------
     img: image
@@ -212,4 +228,6 @@ if __name__ == "__main__":
     print(test_can[:, -1], test_can[:, :3])
     end = timeit.timeit()
     test_can2 = segments2canonical(test_arr)
-    print(test_can2[:, -1], test_can2[:, :3])
+    awa, uwu = test_can2[:, -1], test_can2[:, :3]
+    liness = change2theta_c(uwu, awa)
+    print(liness)
