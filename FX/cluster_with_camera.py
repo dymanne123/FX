@@ -14,8 +14,8 @@ fig,axs=plt.subplots(2,2)
 
 while True :
     _, img = cap.read()
-    pause_time=0.1
-    img_process(img,axs,pause_time)
+    pause_time=0.01
+    img_process(img,axs,pause_time,display_mode=True)
     
     if cv2.waitKey(1)== ord("q"):
         break
