@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn.cluster import MiniBatchKMeans,OPTICS
+from sklearn.cluster import KMeans, OPTICS
 import math
 
 #For a line: a*x+b*y+c=0, get w=(a,b) with two points(x1,y1), (x2,y2)
@@ -94,25 +94,48 @@ def pre_process_data(data):
     return data_processed
 
 def img_process(img,axs,pause_time=0.01,display_mode=False):
-    img_gray_blurred = cv2.GaussianBlur(img, (31, 31), 0)
-    img_gray_blurred[img_gray_blurred>100] = 255
-    img_gray_blurred[img_gray_blurred<100] = 0
-    
-    lower_green = np.array([35,43,46],dtype=np.uint8)
+
+    filter_size = int(img.shape[1] * .05)
+    if filter_size % 2 == 0:
+        filter_size += 1
+
+    """
+    lower_green = np.array([35, 43, 46],dtype=np.uint8)
     upper_green = np.array([77,255,255],dtype=np.uint8)
 
     # Threshold the HSV image to get only blue colors
-    img_hsv = cv2.cvtColor(img_gray_blurred, cv2.COLOR_BGR2HSV)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     mask_by_color = cv2.inRange(img_hsv, lower_green, upper_green) # HFB : Good
-    #gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    #gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)  
    
     # HFB :
-    img_mask = cv2.bitwise_and(img,img, mask= mask_by_color)
+    img_mask = cv2.bitwise_and(img, img, mask=mask_by_color)
     img_mask = cv2.cvtColor(img_mask,cv2.COLOR_BGR2GRAY)
+    """
+
+    
+    red   = img[...,2]
+    green = img[...,1]
+    blue  = img[...,0]
+
+
+    purple = np.maximum(red, blue)
+    mask = purple*1.1 < green
+    img_mask = np.zeros(img.shape[0:-1], dtype=np.uint8)
+    img_mask[mask] = 255
+    print(img_mask)
+
+    cv2.imshow("mask", img_mask)
+
+    
+    img_blurred = cv2.GaussianBlur(img_mask, (filter_size, filter_size), 0)
+    binary = np.zeros_like(img_blurred)
+    binary[img_blurred > 50] = 255
+    cv2.imshow("bin", binary)
     
     fld_detector = cv2.ximgproc.createFastLineDetector()
-    fld_segments = fld_detector.detect(img_mask)
-    #fld_segments = fld_detector.detect(img_gray_blurred)
+    fld_segments = fld_detector.detect(img_blurred)
+    
     if fld_segments is not None:
         fld_segments = fld_segments.reshape((fld_segments.shape[0], 4)) # fld_segments was (n, 1, 4) shaped
     
@@ -130,9 +153,13 @@ def img_process(img,axs,pause_time=0.01,display_mode=False):
         print(matrix_ab)
         if fld_segments.shape[0]>1:
             matrix_ab=pre_process_data(matrix_ab)
-            kmeans = MiniBatchKMeans(n_clusters=1).fit(matrix_ab)
+            
+            """kmeans = KMeans(n_clusters=1).fit(matrix_ab)
             #print(kmeans.cluster_centers_)
-            w= kmeans.cluster_centers_[0]
+            w= kmeans.cluster_centers_[0]"""
+
+            w = np.average(matrix_ab, axis=0)
+            
             w=w/np.linalg.norm(w)
             orig_w=get_orig_w(w) #make a2,b2 return to a,b, after clustering;
             #then get c
@@ -140,8 +167,8 @@ def img_process(img,axs,pause_time=0.01,display_mode=False):
             distribution_c=distribution_c.reshape(-1,1)
             distribution_c=pre_process_data(distribution_c) 
             #print(distribution_c)
-            kmeans_c=MiniBatchKMeans(n_clusters=2,random_state=0).fit(distribution_c)
-            c_pred=MiniBatchKMeans(n_clusters=2).fit_predict(distribution_c)
+            kmeans_c=KMeans(n_clusters=2,random_state=0).fit(distribution_c)
+            c_pred=KMeans(n_clusters=2).fit_predict(distribution_c)
             #print(kmeans_c)
             c1,c2=kmeans_c.cluster_centers_
             #print(c1,c2)
