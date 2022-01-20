@@ -12,7 +12,7 @@ from img_functions import img_process
 
 #cap = cv2.VideoCapture(0) # 0 means /dev/video0, 1 for /dev/video1, ...
 plt.ion()
-fig,axs=plt.subplots(2,2)
+fig,axs=plt.subplots(2,2,figsize=(12,12))
 
 img = cv2.imread("./green_sable.png") 
 img_process(img,axs,display_mode=True)
