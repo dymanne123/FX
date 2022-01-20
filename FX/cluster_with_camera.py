@@ -10,12 +10,12 @@ from img_functions import img_process
 
 cap = cv2.VideoCapture(0) # 0 means /dev/video0, 1 for /dev/video1, ...
 plt.ion()
-fig,axs=plt.subplots(2,2)
+fig,axs=plt.subplots(2,2,figsize=(12,12))
 
 while True :
     _, img = cap.read()
     pause_time=0.01
-    img_process(img,axs,pause_time,display_mode=True)
+    img_process(img,axs,pause_time,display_mode=False)
     
     if cv2.waitKey(1)== ord("q"):
         break
