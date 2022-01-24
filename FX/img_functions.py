@@ -110,6 +110,8 @@ def img_process(img,axs,pause_time=0.01,display_mode=False,detect_mode=1):
     t=np.array([])
     stage_name=np.array(["mask","blur","fld","proc_ab","proc_c","display"])
 
+    return_values=np.zeros(3)
+
     #stage1:mask
 
     start=time.process_time_ns()
@@ -171,7 +173,7 @@ def img_process(img,axs,pause_time=0.01,display_mode=False,detect_mode=1):
     t=np.append(t,np.array([(end-start)]))
 
     if fld_segments is None:
-        return
+        return return_values
 
     if fld_segments.shape[0]<6:
         t=np.append(t,np.array([.0,.0,.0]))
@@ -225,6 +227,13 @@ def img_process(img,axs,pause_time=0.01,display_mode=False,detect_mode=1):
         end=time.process_time_ns()
         t=np.append(t,np.array([(end-start)]))
 
+        wx,wy=orig_w
+        if(wx>0):
+            c_right=max(c1,c2)
+        else:
+            c_right=min(c1,c2)
+
+        return_values=wx,wy,c_right
         #stage 6: display
         start=time.process_time_ns()
         draw_lines(img,orig_w,c1)
@@ -255,4 +264,4 @@ def img_process(img,axs,pause_time=0.01,display_mode=False,detect_mode=1):
     print(t)
     print(stage_name)
     cv2.imshow("img", img)
-    return   
+    return return_values
