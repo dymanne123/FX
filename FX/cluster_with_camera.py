@@ -13,7 +13,10 @@ cap = cv2.VideoCapture(0) # 0 means /dev/video0, 1 for /dev/video1, ...
 plt.ion()
 fig,axs=plt.subplots(2,2,figsize=(12,12))
 start=time.process_time()
-
+t_prio=0
+wx_prio=0
+wy_prio=0
+c_prio=0
 while True :
     _, img = cap.read()
     pause_time=0.01
@@ -23,9 +26,12 @@ while True :
     axs[0][0].scatter(t,wx,c="red")
     axs[0][0].scatter(t,wy,c="blue")
     axs[0][1].scatter(t,c,c="blue")
+    axs[1][0].scatter(t,(wx-wx_prio)/(t-t_prio),c="red")
+    axs[1][0].scatter(t,(wy-wy_prio)/(t-t_prio),c="blue")
+    axs[1][1].scatter(t,(c-c_prio)/(t-t_prio),c="blue")
     plt.show()
     plt.pause(0.01)
-    
+    t_prio,wx_prio,wy_prio,c_prio=t,wx,wy,c
     if cv2.waitKey(1)== ord("q"):
         break
 
