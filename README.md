@@ -1,15 +1,13 @@
 # FX
-functions implemented:
+Welcome to the sound processing branch! This repository is composed of 2 directories: 
 
-1.colored detect
+1.soundgentest: repository with some test cases and different usages of the library Python Sound Device
 
-2.sound visualize(turn sound into waves)
+2.soundFX : the final product wich contains the class used for generating sound and it's respective audio file.
 
+# Necessary Packages
+Python SoundDevice
+Numpy
+time
+Multithreading
 
-functions to be implemented:
-
-1.line detect and color filling
-
-2.moving detect or hit detect
-
-3.creating sounds
