@@ -14,8 +14,8 @@ from img_functions import img_process
 plt.ion()
 fig,axs=plt.subplots(2,2,figsize=(12,12))
 
-img = cv2.imread("./green_sable.png") 
-img_process(img,axs,display_mode=True)
+img = cv2.imread("../green_sable.png") 
+img_process(img,axs,display_mode=False)
 
 plt.pause(100)
 #cap.release()
