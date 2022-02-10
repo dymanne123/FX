@@ -77,6 +77,10 @@ def draw_lines(img,w,c):
 #display the clusters of a 2D matrix in a subplot
 def display_matrix(matrix,i,j,axs,str=" ",color="red"):
     axs[i][j].scatter(matrix[:,0],matrix[:,1],c=color)
+    theta = np.linspace(0, 2 * np.pi, 200)
+    x = np.cos(theta)
+    y = np.sin(theta)
+    axs[i][j].plot(x, y, color="darkred", linewidth=1)
     if str!=" ":
         axs[i][j].set_title(str)
     axs[i][j].set_xlim(-1,1)
@@ -169,6 +173,7 @@ def img_process(img,axs,pause_time=0.01,display_mode=False,detect_mode=1):
     
     img_lines=fld_detector.drawSegments(img,fld_segments)
     cv2.imshow('lines',img_lines)
+    cv2.imshow("img2",img)
     end=time.process_time_ns()
     t=np.append(t,np.array([(end-start)]))
 
@@ -261,7 +266,7 @@ def img_process(img,axs,pause_time=0.01,display_mode=False,detect_mode=1):
             plt.pause(pause_time)
         else:
             t=np.append(t,np.array([.0]))
-    print(t)
-    print(stage_name)
+    #print(t)
+    #print(stage_name)
     cv2.imshow("img", img)
     return return_values
