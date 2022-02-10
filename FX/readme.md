@@ -7,4 +7,4 @@ True (line 35). If you want to see the change of parameter ’a’, ’b’ and 
 can change ’False’ to ’True’ (line 45).
 
 Click ’run’ in ’cluster with picture.py’, a picture contains the green stick will
-appear, the two long line on the edge of stick will be drawn
+appear, the two long line on the edge of stick will be drawn.
