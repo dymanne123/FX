@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 import math
 import timeit
+import img_functions
 
 
 def segments2canonical(cv2_segment_output):
@@ -157,12 +158,10 @@ def draw_lines(img, lines):
     --------
     image with the two lines that are drawn
     """
-    h, w, _ = img.shape
     a1, b1, c1 = lines[0]
     a2, b2, c2 = lines[1]
-    arr_p0 = np.array([(0, 0), (w, 0), (0, h), (w, h)])
-    arr_p1 = np.array([a1 * arr[0] + b1 * arr[1] + c1 for arr in arr_p0])
-    arr_p2 = np.array([a2 * arr[0] + b2 * arr[1] + c2 for arr in arr_p0])
+    img_functions.draw_lines(img,(a1,b1),c1)
+    img_functions.draw_lines(img,(a2,b2),c2)
 
 
 def img_procesings(img):
@@ -212,22 +211,17 @@ def img_procesings(img):
         abtheta = canonical_eq[:, :3]
         c_values = canonical_eq[:, -1]
         result = change2theta_c(abtheta, c_values)
-        # plt.figure()
-        # plt.scatter(abtheta[0], abtheta[1])
-        # plt.xlabel("valeur de a")
-        # plt.ylabel("valeur de b")
-        # plt.title("transformations")
+        draw_lines(img,result)
+        plt.figure()
+        plt.scatter(abtheta[0], abtheta[1])
+        plt.xlabel("valeur de a")
+        plt.ylabel("valeur de b")
+        plt.title("transformations")
+        cv2.imshow("final", img)
+
 
 
 if __name__ == "__main__":
 
-    test_arr = np.array([[-1, 1, -3, 4], [0, -8, 1, -7], [3, -0.5, 10, -0.5]])
-    test_arrs = np.array([[-1, 1, -3, 4]])
-    start = timeit.timeit()
-    test_can = segments2canonical_arr(test_arr)
-    print(test_can[:, -1], test_can[:, :3])
-    end = timeit.timeit()
-    test_can2 = segments2canonical(test_arr)
-    awa, uwu = test_can2[:, -1], test_can2[:, :3]
-    liness = change2theta_c(uwu, awa)
-    print(liness)
+    h,w =480,640
+    
